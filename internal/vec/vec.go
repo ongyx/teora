@@ -25,7 +25,7 @@ type Vec struct {
 	Path vector.Path
 }
 
-// Move moves the vec's current position to a new position.
+// Move moves the vector to a new position.
 // This does not draw anything.
 func (v *Vec) Move(to image.Point) {
 	v.Path.MoveTo(float32(to.X), float32(to.Y))
@@ -65,7 +65,13 @@ func (v *Vec) Circle(center image.Point, radius float32) {
 	v.Arc(center, radius, 0, 2*math.Pi)
 }
 
-// Draw renders the vector drawing to the destination image.
+// Close closes the current vector path and creates a new one.
+// This can be used to begin a separate drawing.
+func (v *Vec) Close() {
+	v.Path.Close()
+}
+
+// Draw draws the vector to the destination image.
 func (v *Vec) Draw(dst *ebiten.Image, o *DrawOptions) {
 	op := &ebiten.DrawTrianglesOptions{
 		// color.Color.RGBA() returns pre-multiplied alpha values,

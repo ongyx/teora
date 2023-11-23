@@ -7,8 +7,6 @@ import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 
-	"github.com/hajimehoshi/ebiten/v2"
-
 	"github.com/ongyx/teora/internal/text"
 	"github.com/ongyx/teora/internal/util"
 )
@@ -23,7 +21,7 @@ var (
 func init() {
 	o := &opentype.FaceOptions{
 		Size:    12,
-		DPI:     96 * ebiten.DeviceScaleFactor(),
+		DPI:     96,
 		Hinting: font.HintingFull,
 	}
 
