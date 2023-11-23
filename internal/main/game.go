@@ -5,7 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 
-	"github.com/ongyx/teora/internal/assets"
+	"github.com/ongyx/teora/internal/assets/fonts"
 	"github.com/ongyx/teora/internal/vec"
 )
 
@@ -21,7 +21,7 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	assets.CommitMono.DebugPrint(screen, "Hello World!")
+	fonts.CommitMono.DebugPrint(screen, "Hello World!")
 
 	s := screen.Bounds().Size()
 	c := s.Div(2)

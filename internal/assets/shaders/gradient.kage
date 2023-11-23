@@ -1,5 +1,7 @@
 package main
 
+//kage:unit pixels
+
 func Fragment(position vec4, texCoord vec2, color vec4) vec4 {
 	pos := position.xy / imageDstTextureSize()
 	origin, size := imageDstRegionOnTexture()

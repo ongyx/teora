@@ -1,6 +1,7 @@
-package assets
+package fonts
 
 import (
+	"embed"
 	"io"
 
 	"golang.org/x/image/font"
@@ -9,12 +10,14 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 
 	"github.com/ongyx/teora/internal/text"
+	"github.com/ongyx/teora/internal/util"
 )
 
 var (
-	CommitMono *text.Printer
+	//go:embed *.otf *.ttf
+	embedFS embed.FS
 
-	Teoran *text.Printer
+	CommitMono, Teoran *text.Printer
 )
 
 func init() {
@@ -24,9 +27,9 @@ func init() {
 		Hinting: font.HintingFull,
 	}
 
-	CommitMono = must(loadFont("fonts/CommitMono-400-Regular.otf", o))
+	CommitMono = util.Must(loadFont("CommitMono-400-Regular.otf", o))
 
-	Teoran = must(loadFont("fonts/teoran.ttf", o))
+	Teoran = util.Must(loadFont("teoran.ttf", o))
 }
 
 func loadFont(name string, fo *opentype.FaceOptions) (*text.Printer, error) {

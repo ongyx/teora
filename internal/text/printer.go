@@ -39,7 +39,7 @@ func (p *Printer) Print(dst *ebiten.Image, txt string, pt image.Point, c color.C
 
 // DebugPrint prints text to the upper left corner of the destination image.
 func (p *Printer) DebugPrint(dst *ebiten.Image, txt string) {
-	h := p.face.Metrics().Height.Ceil()
+	h := p.Bound(txt).Dy()
 
 	p.Print(dst, txt, image.Point{0, h}, color.White)
 }

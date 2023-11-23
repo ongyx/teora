@@ -1,19 +1,22 @@
-package assets
+package shaders
 
 import (
+	"embed"
+	
 	"github.com/hajimehoshi/ebiten/v2"
+
+	"github.com/ongyx/teora/internal/util"
 )
 
 var (
+	//go:embed *.kage
+	embedFS embed.FS
+	
 	Gradient *ebiten.Shader
 )
 
 func init() {
-	if g, err := loadShader("shaders/gradient.go"); err != nil {
-		panic(err)
-	} else {
-		Gradient = g
-	}
+	Gradient = util.Must(loadShader("gradient.kage"))
 }
 
 func loadShader(path string) (*ebiten.Shader, error) {

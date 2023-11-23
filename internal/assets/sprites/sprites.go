@@ -1,19 +1,25 @@
-package assets
+package sprites
 
 import (
+	"embed"
 	"image"
 	_ "image/png"
 
 	"github.com/hajimehoshi/ebiten/v2"
+
+	"github.com/ongyx/teora/internal/util"
 )
 
 var (
+	//go:embed *.png
+	embedFS embed.FS
+	
 	Demo, Arrow *ebiten.Image
 )
 
 func init() {
-	Demo = must(loadSprite("sprites/demo.png"))
-	Arrow = must(loadSprite("sprites/arrow.png"))
+	Demo = util.Must(loadSprite("sprites/demo.png"))
+	Arrow = util.Must(loadSprite("sprites/arrow.png"))
 }
 
 func loadSprite(path string) (*ebiten.Image, error) {
