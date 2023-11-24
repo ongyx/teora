@@ -72,7 +72,12 @@ func (v *Vec) Close() {
 }
 
 // Draw draws the vector to the destination image.
+// If o is nil, DefaultDrawOptions is used.
 func (v *Vec) Draw(dst *ebiten.Image, o *DrawOptions) {
+	if o == nil {
+		o = DefaultDrawOptions()
+	}
+
 	op := &ebiten.DrawTrianglesOptions{
 		// color.Color.RGBA() returns pre-multiplied alpha values,
 		// so use the correct scale mode.

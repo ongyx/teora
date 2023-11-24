@@ -18,3 +18,10 @@ type DrawOptions struct {
 	// Whether or not the vector drawing should be anti-aliased.
 	AntiAlias bool
 }
+
+// DefaultDrawOptions returns the default drawing options used in vec.Draw.
+func DefaultDrawOptions() *DrawOptions {
+	return &DrawOptions{
+		Color: color.White,
+	}
+}
