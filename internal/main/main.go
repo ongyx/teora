@@ -9,7 +9,7 @@ import (
 func main() {
 	ebiten.SetFullscreen(true)
 
-	g := &Game{}
+	g := NewGame()
 
 	if err := ebiten.RunGame(g); err != nil {
 		fmt.Println(err)

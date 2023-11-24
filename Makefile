@@ -19,12 +19,12 @@ help:       ## Show this help.
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
 
 native:     ## Build Teora as a native binary.
-	go build -tags=$(TAGS) -o $(BINARY) ./internal/main
+	go build -tags='$(TAGS)' -o '$(BINARY)' ./internal/main
 
 windows: export GOOS := windows
 windows: export GOARCH := amd64
 windows:    ## Build Teora as a Windows console app.
-	go build -tags=$(TAGS) $(FLAGS) -o $(BINARY).exe ./internal/main
+	go build -tags='$(TAGS)' $(FLAGS) -o '$(BINARY).exe' ./internal/main
 
 windowsgui: export FLAGS := $(FLAGS) -ldflags -H=windowsgui
 windowsgui: windows
