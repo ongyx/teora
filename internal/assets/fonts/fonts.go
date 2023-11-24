@@ -39,5 +39,5 @@ func loadFont(name string, fo *opentype.FaceOptions) (*text.Printer, error) {
 	// This should never panic; embed.FS files implement io.ReaderAt
 	r := f.(io.ReaderAt)
 
-	return text.NewPrinter(r, fo)
+	return text.NewPrinterFromReader(r, fo)
 }

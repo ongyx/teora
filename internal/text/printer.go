@@ -7,6 +7,7 @@ import (
 
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
+	"golang.org/x/image/math/fixed"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -14,11 +15,11 @@ import (
 
 // Printer is a text drawer.
 type Printer struct {
-	face font.Face
+	Face font.Face
 }
 
-// NewPrinter creates a new printer using the OpenType or TrueType font in src.
-func NewPrinter(src io.ReaderAt, fo *opentype.FaceOptions) (*Printer, error) {
+// NewPrinterFromReader creates a new printer using the OpenType or TrueType font in src.
+func NewPrinterFromReader(src io.ReaderAt, fo *opentype.FaceOptions) (*Printer, error) {
 	f, err := opentype.ParseReaderAt(src)
 	if err != nil {
 		return nil, err
@@ -29,29 +30,64 @@ func NewPrinter(src io.ReaderAt, fo *opentype.FaceOptions) (*Printer, error) {
 		return nil, err
 	}
 
-	return &Printer{face: fc}, nil
+	return &Printer{Face: fc}, nil
 }
 
 // Print prints text to the destination image at the given point.
 func (p *Printer) Print(dst *ebiten.Image, txt string, pt image.Point, c color.Color) {
-	text.Draw(dst, txt, p.face, pt.X, pt.Y, c)
+	text.Draw(dst, txt, p.Face, pt.X, pt.Y, c)
 }
 
 // DebugPrint prints text to the upper left corner of the destination image.
 func (p *Printer) DebugPrint(dst *ebiten.Image, txt string) {
-	h := p.Bound(txt).Dy()
+	h := p.Face.Metrics().Height
 
-	p.Print(dst, txt, image.Point{0, h}, color.White)
+	p.Print(dst, txt, image.Point{Y: h.Ceil()}, color.White)
 }
 
-// Bound returns the drawn size of the text in pixels.
-func (p *Printer) Bound(txt string) image.Rectangle {
-	b, _ := font.BoundString(p.face, txt)
+// Measure returns the drawn size of the text in pixels.
+// This function is similar to MeasureString in the x/image/font package, except that newlines are accounted for.
+func (p *Printer) Measure(txt string) image.Rectangle {
+	var (
+		bounds  fixed.Rectangle26_6
+		advance fixed.Point26_6
+
+		prevR rune = -1
+	)
+
+	height := p.Face.Metrics().Height
+
+	for _, r := range txt {
+		if prevR >= 0 {
+			// Advance X by the kern between the previous and current rune.
+			advance.X += p.Face.Kern(prevR, r)
+		}
+
+		if r == '\n' {
+			// Reset X, advance Y, and process the next rune.
+			advance.X = 0
+			advance.Y += height
+			prevR = -1
+
+			continue
+		}
+
+		b, a, _ := p.Face.GlyphBounds(r)
+
+		// Extend bounds by the advance.
+		bounds = bounds.Union(b.Add(advance))
+
+		// Advance X by the glyph's width.
+		advance.X += a
+
+		// Set the previous rune to the current one.
+		prevR = r
+	}
 
 	return image.Rect(
-		b.Min.X.Floor(),
-		b.Min.Y.Floor(),
-		b.Max.X.Ceil(),
-		b.Max.Y.Ceil(),
+		bounds.Min.X.Floor(),
+		bounds.Min.Y.Floor(),
+		bounds.Max.X.Ceil(),
+		bounds.Max.Y.Ceil(),
 	)
 }
