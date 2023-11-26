@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/hajimehoshi/ebiten/v2"
+
+	_ "github.com/silbinarywolf/preferdiscretegpu"
 )
 
 func main() {

@@ -16,10 +16,3 @@
 
 # Release binaries will be built here.
 build/
-
-# Data that can be rebuilt/go generate files
-assets/fonts/svg/
-assets/fonts/*.go
-
-# logs
-log.txt

@@ -4,31 +4,30 @@
 ## These variables can be set to customise building Teora:
 ## * BINARY: The path to the built binary.
 ## * TAGS: The tags to use to build Teora:
-##     * debug: Enable debug mode.
-##     * pprof: Start a live pprof server for profiling.
-## * FLAGS: Flags to pass to the 'go build' command.
+##     * debug.pprof: Start a live pprof server for profiling.
 ## 
 
 BINARY := build/teora
-TAGS := debug
-FLAGS :=
+TAGS :=
 
-.PHONY: bootstrap clean
+GOFLAGS := -tags='$(TAGS)'
 
-help:       ## Show this help.
+help:    ## Show this help.
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
 
-native:     ## Build Teora as a native binary.
-	go build -tags='$(TAGS)' -o '$(BINARY)' ./internal/main
+go:
+	go build ./internal/main
+
+native: go
+native:  ## Build Teora as a native binary.
 
 windows: export GOOS := windows
 windows: export GOARCH := amd64
-windows:    ## Build Teora as a Windows console app.
-	go build -tags='$(TAGS)' $(FLAGS) -o '$(BINARY).exe' ./internal/main
+windows: export GOFLAGS := $(GOFLAGS) -ldflags=-H=windowsgui -o=$(BINARY).exe
+windows: export CGO_ENABLED := 1
+windows: export CC := x86_64-w64-mingw32-gcc
+windows: go
+windows: ## Build Teora on Windows.
 
-windowsgui: export FLAGS := $(FLAGS) -ldflags -H=windowsgui
-windowsgui: windows
-windowsgui: ## Build Teora as a Windows GUI app.
-
-assets:     ## Build Teora's assets.
+assets:  ## Build Teora's assets.
 	$(MAKE) -C internal/assets/fonts/teoran
