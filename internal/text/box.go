@@ -56,8 +56,6 @@ func (b *Box) Update() {
 }
 
 // Draw draws the text box to the destination image at the given point.
-//
-// NOTE: The point represents the bottom-left point of the text box, not the top-left as with a normal image.
 func (b *Box) Draw(dst *ebiten.Image, pt image.Point, c color.Color) {
 	b.printer.Print(dst, b.text[:b.idx], pt, c)
 }

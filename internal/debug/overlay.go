@@ -20,7 +20,9 @@ type Overlay struct {
 	printer *text.Printer
 	point   image.Point
 
-	info       info
+	screenSize      image.Point
+	graphicsLibrary string
+
 	text       string
 	background image.Rectangle
 }
@@ -32,7 +34,24 @@ func NewOverlay(p *text.Printer, pt image.Point) *Overlay {
 
 // Update updates the overlay.
 func (o *Overlay) Update() {
-	o.text = o.info.String()
+	if o.graphicsLibrary == "" {
+		var di ebiten.DebugInfo
+		ebiten.ReadDebugInfo(&di)
+
+		o.graphicsLibrary = di.GraphicsLibrary.String()
+	}
+
+	o.text = fmt.Sprintf(
+		`Running on %s
+Screen size (%d, %d)
+%f TPS
+%f FPS`,
+		o.graphicsLibrary,
+		o.screenSize.X,
+		o.screenSize.Y,
+		ebiten.ActualTPS(),
+		ebiten.ActualFPS(),
+	)
 
 	// Use the bounding box as the background.
 	o.background = o.printer.Measure(o.text).Add(o.point)
@@ -40,6 +59,8 @@ func (o *Overlay) Update() {
 
 // Draw draws debug information to the destination image.
 func (o *Overlay) Draw(dst *ebiten.Image) {
+	o.screenSize = dst.Bounds().Size()
+
 	// Draw the background.
 	var v vec.Vec
 	v.Rect(o.background)
@@ -47,25 +68,4 @@ func (o *Overlay) Draw(dst *ebiten.Image) {
 
 	// Draw the text text.
 	o.printer.Print(dst, o.text, o.point, color.White)
-}
-
-type info struct {
-	glib     string
-	tps, fps float64
-}
-
-func (i info) String() string {
-	if i.glib == "" {
-		var di ebiten.DebugInfo
-		ebiten.ReadDebugInfo(&di)
-
-		i.glib = di.GraphicsLibrary.String()
-	}
-
-	i.fps = ebiten.ActualFPS()
-	i.tps = ebiten.ActualTPS()
-
-	return fmt.Sprintf(`Running on %s
-%f TPS
-%f FPS`, i.glib, i.tps, i.fps)
 }
