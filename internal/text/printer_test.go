@@ -1,11 +1,11 @@
 package text
 
 import (
+	"image"
 	"testing"
 
+	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
-
-	"github.com/hajimehoshi/ebiten/v2/text"
 )
 
 const (
@@ -13,12 +13,18 @@ const (
 )
 
 var (
-	printer = &Printer{Face: basicfont.Face7x13}
+	printer = NewPrinter(basicfont.Face7x13)
 )
 
 func TestPrinterMeasure(t *testing.T) {
-	r1 := text.BoundString(printer.Face, greeting)
-	r2 := printer.Measure(greeting)
+	m := printer.Face().Metrics()
+	a := image.Point{Y: m.Ascent.Ceil()}
+
+	b, _ := font.BoundString(printer.Face(), greeting)
+	r1 := rtoi(b)
+
+	// Subtract ascent to get the measurement relative to the origin.
+	r2 := printer.Measure(greeting).Sub(a)
 
 	if r1 != r2 {
 		t.Errorf("measure results incorrect: expected %#v, got %#v", r1, r2)

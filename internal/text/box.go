@@ -3,7 +3,6 @@ package text
 import (
 	"image"
 	"image/color"
-	"sync"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -13,7 +12,6 @@ import (
 type Box struct {
 	printer *Printer
 
-	mu       sync.Mutex
 	text     string
 	idx, len int
 

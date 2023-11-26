@@ -4,6 +4,7 @@ go 1.21.4
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.6.2
+	github.com/silbinarywolf/preferdiscretegpu v1.0.0
 	golang.org/x/image v0.12.0
 )
 

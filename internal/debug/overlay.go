@@ -11,13 +11,8 @@ import (
 	"github.com/ongyx/teora/internal/vec"
 )
 
-const (
-	overlayTemplate = `%f TPS
-%f FPS`
-)
-
 var (
-	backgroundColor = color.RGBA{R: 127, G: 127, B: 127, A: 127}
+	backgroundColor = color.RGBA{A: 127}
 )
 
 // Overlay is a graphical overlay that shows debug information.
@@ -25,34 +20,52 @@ type Overlay struct {
 	printer *text.Printer
 	point   image.Point
 
-	info   string
-	bounds image.Rectangle
+	info       info
+	text       string
+	background image.Rectangle
 }
 
 // NewOverlay creates a new overlay, printing debug information using the given printer at the point.
 func NewOverlay(p *text.Printer, pt image.Point) *Overlay {
-	// Add height to compensate for the origin.
-	m := p.Face.Metrics()
-	pt.Y += m.Height.Ceil()
-
 	return &Overlay{printer: p, point: pt}
 }
 
 // Update updates the overlay.
 func (o *Overlay) Update() {
-	o.info = fmt.Sprintf(overlayTemplate, ebiten.ActualTPS(), ebiten.ActualFPS())
+	o.text = o.info.String()
 
-	// Use the bounding box of the info text to draw a background.
-	o.bounds = o.printer.Measure(o.info)
+	// Use the bounding box as the background.
+	o.background = o.printer.Measure(o.text).Add(o.point)
 }
 
 // Draw draws debug information to the destination image.
 func (o *Overlay) Draw(dst *ebiten.Image) {
 	// Draw the background.
 	var v vec.Vec
-	v.Rect(o.bounds.Add(o.point))
+	v.Rect(o.background)
 	v.Draw(dst, &vec.DrawOptions{Color: backgroundColor})
 
-	// Draw the info text.
-	o.printer.Print(dst, o.info, o.point, color.White)
+	// Draw the text text.
+	o.printer.Print(dst, o.text, o.point, color.White)
+}
+
+type info struct {
+	glib     string
+	tps, fps float64
+}
+
+func (i info) String() string {
+	if i.glib == "" {
+		var di ebiten.DebugInfo
+		ebiten.ReadDebugInfo(&di)
+
+		i.glib = di.GraphicsLibrary.String()
+	}
+
+	i.fps = ebiten.ActualFPS()
+	i.tps = ebiten.ActualTPS()
+
+	return fmt.Sprintf(`Running on %s
+%f TPS
+%f FPS`, i.glib, i.tps, i.fps)
 }

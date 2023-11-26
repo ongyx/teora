@@ -49,7 +49,7 @@ func main() {
 	mt := face.Metrics()
 	fmt.Printf("height: %d, ascent: %d, descent: %d\n", mt.Height.Ceil(), mt.Ascent.Ceil(), mt.Descent.Ceil())
 
-	p := &internal_text.Printer{Face: face}
+	p := internal_text.NewPrinter(face)
 	m := p.Measure(greeting)
 	fmt.Printf("Printer.Measure: (%d, %d), (%d, %d)\n", m.Min.X, m.Min.Y, m.Max.X, m.Max.Y)
 
