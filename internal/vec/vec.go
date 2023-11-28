@@ -89,8 +89,8 @@ func (v *Vec) Draw(dst *ebiten.Image, o *DrawOptions) {
 	var is []uint16
 
 	// Draw a stroke if the appropriate options are set.
-	if o.Stroke != (vector.StrokeOptions{}) {
-		vs, is = v.Path.AppendVerticesAndIndicesForStroke(nil, nil, &o.Stroke)
+	if o.StrokeOp != (vector.StrokeOptions{}) {
+		vs, is = v.Path.AppendVerticesAndIndicesForStroke(nil, nil, &o.StrokeOp)
 	} else {
 		vs, is = v.Path.AppendVerticesAndIndicesForFilling(nil, nil)
 

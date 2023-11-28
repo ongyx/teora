@@ -6,13 +6,16 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 
 	"github.com/ongyx/teora/internal/text"
 	"github.com/ongyx/teora/internal/vec"
 )
 
 var (
-	backgroundColor = color.RGBA{A: 127}
+	overlayBg = color.RGBA{A: 127}
+	overlayFg = color.White
+	overlayX  = color.RGBA{R: 255, A: 255}
 )
 
 // Overlay is a graphical overlay that shows debug information.
@@ -20,8 +23,10 @@ type Overlay struct {
 	printer *text.Printer
 	point   image.Point
 
-	screenSize      image.Point
 	graphicsLibrary string
+	screenSize      image.Point
+	deviceScale     float64
+	cursorPosition  image.Point
 
 	text       string
 	background image.Rectangle
@@ -41,14 +46,25 @@ func (o *Overlay) Update() {
 		o.graphicsLibrary = di.GraphicsLibrary.String()
 	}
 
+	if o.deviceScale == 0 {
+		o.deviceScale = ebiten.DeviceScaleFactor()
+	}
+
+	o.cursorPosition = image.Pt(ebiten.CursorPosition())
+
 	o.text = fmt.Sprintf(
 		`Running on %s
-Screen size (%d, %d)
-%f TPS
-%f FPS`,
+Screen (%d, %d)
+DScale %0.2f
+Cursor (%d, %d)
+TPS    %f
+FPS    %f`,
 		o.graphicsLibrary,
 		o.screenSize.X,
 		o.screenSize.Y,
+		o.deviceScale,
+		o.cursorPosition.X,
+		o.cursorPosition.Y,
 		ebiten.ActualTPS(),
 		ebiten.ActualFPS(),
 	)
@@ -61,11 +77,32 @@ Screen size (%d, %d)
 func (o *Overlay) Draw(dst *ebiten.Image) {
 	o.screenSize = dst.Bounds().Size()
 
-	// Draw the background.
-	var v vec.Vec
-	v.Rect(o.background)
-	v.Draw(dst, &vec.DrawOptions{Color: backgroundColor})
+	// Draw a crosshair.
+	var ch vec.Vec
 
-	// Draw the text text.
-	o.printer.Print(dst, o.text, o.point, color.White)
+	// The vertical line of the crosshair.
+	vl := image.Point{X: o.cursorPosition.X}
+	ch.Move(vl)
+	vl.Y = o.screenSize.Y
+	ch.Line(vl)
+
+	// The horizontal line of the crosshair.
+	hl := image.Point{Y: o.cursorPosition.Y}
+	ch.Move(hl)
+	hl.X = o.screenSize.X
+	ch.Line(hl)
+
+	ch.Draw(dst, &vec.DrawOptions{
+		StrokeOp: vector.StrokeOptions{Width: 1},
+		Color:    overlayX,
+	})
+
+	// Draw the background.
+	var bg vec.Vec
+
+	bg.Rect(o.background)
+	bg.Draw(dst, &vec.DrawOptions{Color: overlayBg})
+
+	// Draw the text.
+	o.printer.Print(dst, o.text, o.point, overlayFg)
 }

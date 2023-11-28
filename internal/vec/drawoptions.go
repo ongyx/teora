@@ -10,7 +10,7 @@ import (
 type DrawOptions struct {
 	// Options for drawing the vector as a stroke.
 	// If not set, the vector drawing is filled.
-	Stroke vector.StrokeOptions
+	StrokeOp vector.StrokeOptions
 
 	// The color that the vector should be drawn in.
 	Color color.Color
